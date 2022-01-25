@@ -1,7 +1,6 @@
 tmp
 .vscode
 .gitignore
-
 README.md
-
 *.html
+input/oi

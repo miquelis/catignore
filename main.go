@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -34,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	path := filepath.Join(rootDir, ".gcloudignore")
+	path := filepath.Join(rootDir, ".catignore")
 
 	// var path string = "/mnt/c/Users/rapha/Documents/globo/Cloud Functions/slack-bot-incident-early-warning-alerts/src/.catignore"
 
@@ -116,13 +114,13 @@ func ReadCatIgnore(path string) ([]string, error) {
 
 	for fileScanner.Scan() {
 
-		lines = append(lines, fileScanner.Text())
+		lines = append(lines, filepath.Join(filepath.Dir(path), fileScanner.Text()))
 	}
 
-	lines = append(lines, ".catignore")
+	lines = append(lines, filepath.Join(filepath.Dir(path), ".catignore"))
 
 	if err := CheckFileExist(filepath.Join(filepath.Dir(path), ".git"), ".git"); err == nil {
-		lines = append(lines, ".git")
+		lines = append(lines, filepath.Join(filepath.Dir(path), ".git"))
 	}
 
 	readFile.Close()
@@ -148,24 +146,23 @@ func ZipCatIgnore(rootDir string, lines []string, outputFilePath string) (string
 	archive := zip.NewWriter(zipfile)
 	defer archive.Close()
 
-	fileList, err := ioutil.ReadDir(rootDir)
+	filterFiles, err := FilterFiles(rootDir, lines)
+
 	if err != nil {
 		return "", err
 	}
 
-	filterFiles := FilterFiles(fileList, lines)
-
 	for _, source := range filterFiles {
 
-		filePath := filepath.Join(rootDir, source)
+		// filePath := filepath.Join(rootDir, source)
 
-		err = filepath.Walk(filePath, func(path string, info os.FileInfo, err error) error {
+		err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 
 			if info.IsDir() {
-				if filePath == path {
+				if source == path {
 					return nil
 				}
 				path += PATH_SEPARATOR
@@ -212,32 +209,85 @@ func ZipCatIgnore(rootDir string, lines []string, outputFilePath string) (string
 	return fileName, nil
 }
 
-func FilterFiles(fileList []fs.FileInfo, lines []string) []string {
-	var files []string
+func FilterFiles(rootDir string, lines []string) ([]string, error) {
 
-	for _, file := range fileList {
-		files = append(files, file.Name())
+	var files, newLines, filterFiles []string
+
+	for i, line := range lines {
+
+		extension := strings.Split(line, "*")
+		var extensionInt = len(extension)
+
+		if extensionInt > 1 && extension[1] != "" {
+
+			re, _ := regexp.Compile(fmt.Sprintf(`([a-zA-Z0-9\s_\\.\-\(\):])+(%s)$`, extension[1]))
+
+			err := filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+
+				if info.IsDir() {
+					if line == path {
+						return nil
+					}
+					path += PATH_SEPARATOR
+				}
+
+				if re.MatchString(path) {
+					newLines = append(newLines, path)
+				}
+
+				return err
+			})
+
+			// Remove the element at index i from a.
+			copy(lines[i:], lines[i+1:]) // Shift lines[i+1:] left one index.
+			lines[len(lines)-1] = ""     // Erase last element (write zero value).
+			lines = lines[:len(lines)-1] // Truncate slice.
+
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
-	for _, file := range files {
+	for _, line := range lines {
+		err := filepath.Walk(line, func(path string, info os.FileInfo, err error) error {
 
-		extension := strings.Split(file, "*")
+			if info.IsDir() {
+				if line == path {
+					return nil
+				}
+				path += PATH_SEPARATOR
+			}
+			newLines = append(newLines, path)
+			return err
+		})
 
-		if extension[1] != "" {
-			var re = regexp.MustCompile(fmt.Sprintf(`(?i)^(.*\.((%s)$))?[^.]*$`, extension[1]))
+		if err != nil {
+			return nil, err
+		}
+	}
 
-			// if len(re.FindStringIndex(str)) > 0 {
-			// 	fmt.Println(re.FindString(str), "found at index", re.FindStringIndex(str)[0])
-			// }
+	err := filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+
+		if info.IsDir() {
+			if rootDir == path {
+				return nil
+			}
+			path += PATH_SEPARATOR
+		} else {
+			files = append(files, path)
 		}
 
-	}
+		return err
+	})
 
-	var filterFiles []string
+	if err != nil {
+		return nil, err
+	}
 
 	for _, file := range files {
 		exist := false
-		for _, line := range lines {
+		for _, line := range newLines {
 			if file == line {
 				exist = true
 				break
@@ -248,5 +298,5 @@ func FilterFiles(fileList []fs.FileInfo, lines []string) []string {
 		}
 	}
 
-	return filterFiles
+	return filterFiles, nil
 }
