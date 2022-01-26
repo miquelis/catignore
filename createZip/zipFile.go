@@ -2,6 +2,7 @@ package createzip
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -10,6 +11,30 @@ import (
 
 	formatpath "github.com/miquelis/catignore/formatPath"
 )
+
+// CreateZipFile - Start creating the .zip file
+func CreateZipFile(path string) (string, error) {
+
+	var rootDir string = filepath.Dir(path)
+
+	if err := formatpath.CheckCatIgnore(path); err != nil {
+		return "", err
+	}
+
+	pathIgnore, err := formatpath.ReadCatIgnore(path)
+
+	if err != nil {
+		return "", err
+	}
+
+	fileName, err := ZipCatIgnore(rootDir, pathIgnore, filepath.Join(rootDir, "tmp", "functions"))
+
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s file is created successfully", fileName), nil
+}
 
 // ZipCatIgnore - create the zipped file
 func ZipCatIgnore(rootDir string, pathIgnore []string, outputFilePath string) (string, error) {
