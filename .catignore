@@ -1,6 +1,6 @@
-tmp
 .vscode
 .gitignore
 README.md
+*.js
 *.html
-input/oi
+public
