@@ -1,5 +1,4 @@
-.vscode
-.gitignore
-README.md
 *.js
 *.html
+go.mod
+go.sum

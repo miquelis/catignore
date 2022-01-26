@@ -61,10 +61,30 @@ func ReadCatIgnore(path string) ([]string, error) {
 		}
 	}
 
-	pathIgnore = append(pathIgnore, filepath.Join(rootDir, ".catignore"))
+	pathIgnore = DefaultIgnore(pathIgnore, rootDir)
 
 	readFile.Close()
 
 	return pathIgnore, nil
 
+}
+
+func DefaultIgnore(pathIgnore []string, rootDir string) []string {
+
+	listIgnore := []string{
+		".catignore",
+		".gcloudignore",
+		".gitignore",
+		"LICENSE",
+		"README.md",
+	}
+
+	fileDir, _ := SearchFiles(".vscode")
+	listIgnore = append(listIgnore, fileDir...)
+
+	for _, ignoreFile := range listIgnore {
+		pathIgnore = append(pathIgnore, filepath.Join(rootDir, ignoreFile))
+	}
+
+	return pathIgnore
 }

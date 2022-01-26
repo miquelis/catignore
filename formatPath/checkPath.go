@@ -8,9 +8,9 @@ import (
 )
 
 // CheckCatIgnore - Checks if .ignore files exist
-func CheckCatIgnore(path string) error {
+func CheckCatIgnore(path, rootDir string) error {
 
-	files := strings.Split(path, os.Getenv("PATH_SEPARATOR"))
+	files := strings.Split(path, rootDir+os.Getenv("PATH_SEPARATOR"))
 
 	var fileName = files[len(files)-1]
 

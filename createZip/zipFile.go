@@ -7,17 +7,26 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	formatpath "github.com/miquelis/catignore/formatPath"
 )
 
+func init() {
+	if runtime.GOOS == "windows" {
+		os.Setenv("PATH_SEPARATOR", "\\")
+	} else {
+		os.Setenv("PATH_SEPARATOR", "/")
+	}
+}
+
 // CreateZipFile - Start creating the .zip file
-func CreateZipFile(path string) (string, error) {
+func CreateZipFile(path, outputPath string) (string, error) {
 
 	var rootDir string = filepath.Dir(path)
 
-	if err := formatpath.CheckCatIgnore(path); err != nil {
+	if err := formatpath.CheckCatIgnore(path, rootDir); err != nil {
 		return "", err
 	}
 
@@ -27,7 +36,7 @@ func CreateZipFile(path string) (string, error) {
 		return "", err
 	}
 
-	fileName, err := ZipCatIgnore(rootDir, pathIgnore, filepath.Join(rootDir, "tmp", "functions"))
+	fileName, err := ZipCatIgnore(rootDir, pathIgnore, outputPath)
 
 	if err != nil {
 		return "", err
