@@ -29,11 +29,9 @@ func CheckCatIgnore(path, rootDir string) error {
 	default:
 		msg := fmt.Sprintf("check if the %s file is part of the official list of supported files!", fileName)
 
-		if err := errors.New(msg); err != nil {
-			return err
-		}
+		return errors.New(msg)
 	}
-	return nil
+
 }
 
 //CheckFileExist - Checks if a file exists
@@ -41,10 +39,7 @@ func CheckFileExist(path, fileName string) error {
 	file, err := os.Stat(path)
 	if os.IsNotExist(err) || file.Name() != fileName {
 		msg := fmt.Sprintf(`File or folder named "%s" does not exist! Removing your .ignore file!`, fileName)
-
-		if err := errors.New(msg); err != nil {
-			return err
-		}
+		return errors.New(msg)
 	}
 
 	return nil

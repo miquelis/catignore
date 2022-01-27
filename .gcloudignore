@@ -2,3 +2,6 @@ tmp
 .vscode
 .gitignore
 README.md
+*.js
+*.html
+go.sum

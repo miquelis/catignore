@@ -1,3 +1,3 @@
 # catignore
 
-tranformar variaveis files, rootdir e fileIgnore em strucs
+transformar variaveis files, rootdir e fileIgnore em structs

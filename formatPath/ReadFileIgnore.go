@@ -75,6 +75,7 @@ func DefaultIgnore(pathIgnore []string, rootDir string) []string {
 		".catignore",
 		".gcloudignore",
 		".gitignore",
+		"__debug_bin",
 		"LICENSE",
 		"README.md",
 	}
