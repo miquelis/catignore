@@ -1,8 +1,10 @@
-name: Golang
+name: golang-ci
 
 on:
   release:
     types: [created]
+  workflow_dispatch:
+
 jobs:
   release-linux-amd64:
     name: release linux/amd64
@@ -11,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: wangyoucao577/go-release-action@v1.23
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN}}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: linux
           goarch: amd64
           goversion: 1.16
