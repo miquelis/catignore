@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build gorkscrew binary
-        uses: wangyoucao577/go-release-action@master
+        uses: wangyoucao577/go-release-action@v1.23
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
