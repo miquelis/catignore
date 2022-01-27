@@ -46,8 +46,8 @@ jobs:
         goarch: [amd64]
 
     steps:
-      - name: Check release
-        run: echo "VERSION=$(git tag --sort=-v:refname --list "v[0-9]*" | head -n 1 | cut -c 2-)" >> $GITHUB_ENV
+      - name: Check tag
+        run: echo "Version $(git tag --sort=-v:refname --list "v[0-9]*" | head -n 1 | cut -c 2-)"
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -60,4 +60,4 @@ jobs:
           goarch: ${{ matrix.goarch }}
           goversion: 1.16
           build_flags: -v
-          release_tag: echo "VERSION=$(git tag --sort=-v:refname --list "v[0-9]*" | head -n 1 | cut -c 2-)" >> $GITHUB_ENV
+          release_tag: $(git tag --sort=-v:refname --list "v[0-9]*" | head -n 1 | cut -c 2-)
