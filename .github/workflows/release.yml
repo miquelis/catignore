@@ -3,7 +3,6 @@ name: golang-ci
 on:
   release:
     types: [created]
-  workflow_dispatch:
 
 jobs:
   release-linux-amd64:
