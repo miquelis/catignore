@@ -69,6 +69,7 @@ func ReadCatIgnore(path string) ([]string, error) {
 
 }
 
+// DefaultIgnore - Adds files that will be ignored by default. No need to add to ".catignore" file
 func DefaultIgnore(pathIgnore []string, rootDir string) []string {
 
 	listIgnore := []string{

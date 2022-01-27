@@ -2,3 +2,4 @@
 *.html
 go.mod
 go.sum
+catignore
