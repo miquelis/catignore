@@ -36,7 +36,7 @@ jobs:
           body: ${{ steps.tag_version.outputs.changelog }}
 
   build:
-    name: "Build Golang binary"
+    name: "Build Golang Binary"
     runs-on: "ubuntu-latest"
     environment: "prod"
     needs: release
