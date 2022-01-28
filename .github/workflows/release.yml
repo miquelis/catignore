@@ -1,11 +1,8 @@
 # Name of the workflow
-name: Release
+name: Create Release
 
 on:
-  push:
-  pull_request:
-    branches:
-      - "master"
+  workflow_dispatch:
 
 # Automatically create a GitHub Release, with release details specified (the relevant commits)
 jobs:
