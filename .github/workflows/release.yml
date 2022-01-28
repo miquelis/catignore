@@ -9,6 +9,7 @@ jobs:
   release:
     name: "Release"
     runs-on: "ubuntu-latest"
+    environment: "prod"
 
     steps:
       - name: Check out code into the go module directory
