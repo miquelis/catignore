@@ -16,7 +16,7 @@ jobs:
     environment: "prod"
 
     steps:
-      - name: Check out code into the Go module directory
+      - name: Check out code into the go module directory
         uses: actions/checkout@v2
 
       - name: Bump version and push tag
