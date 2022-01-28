@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,6 +17,8 @@ import (
 
 var catIgnorePath, catIgnoreName, outputPath, nameFileZipeed string
 var err error
+var version bool = false
+var VERSION string = "v0.0.0"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -62,6 +65,11 @@ For more information access the documentation: https://github.com/miquelis/catig
 	},
 
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if version {
+			fmt.Println("catignore " + VERSION)
+			os.Exit(0)
+		}
 
 		msg, err := createzip.CreateZipFile(
 			filepath.Join(catIgnorePath, catIgnoreName),
@@ -121,5 +129,7 @@ func init() {
 		"functions",
 		`Specify the name of the zip file. No need to put the .zip extension`,
 	)
+
+	rootCmd.Flags().BoolVarP(&version, "version", "v", false, "Print just the version number.")
 
 }
