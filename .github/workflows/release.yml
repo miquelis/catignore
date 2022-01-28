@@ -15,6 +15,9 @@ jobs:
     runs-on: "ubuntu-latest"
     environment: "prod"
 
+    outputs:
+      tag_version: ${{ steps.tag_version.outputs.new_tag }}
+
     steps:
       - name: Check out code into the go module directory
         uses: actions/checkout@v2
@@ -61,5 +64,5 @@ jobs:
           goarch: ${{ matrix.goarch }}
           goversion: 1.16
           build_flags: -v
-          ldflags: -X 'github.com/${{ github.repository }}/cmd.VERSION=${{ needs.release.steps.tag_version.outputs.new_tag }}'
-          release_tag: ${{ needs.release.steps.tag_version.outputs.new_tag }}
+          ldflags: -X 'github.com/${{ github.repository }}/cmd.VERSION=${{ needs.release.outputs.tag_version }}'
+          release_tag: ${{ needs.release.outputs.tag_version }}
