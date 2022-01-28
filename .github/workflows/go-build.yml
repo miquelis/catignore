@@ -1,0 +1,48 @@
+# Name of the workflow
+name: Build
+
+on:
+  workflow_run:
+    workflows:
+      - Release
+    types:
+      - completed
+
+jobs:
+  build:
+    name: "Build golang binary"
+    runs-on: "ubuntu-latest"
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    strategy:
+      matrix:
+        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
+        goos: [linux, windows, darwin]
+        goarch: ["386", amd64, arm64]
+        exclude:
+          - goarch: "386"
+            goos: darwin
+          - goarch: arm64
+            goos: windows
+
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Required due to the weg Git works, without it this action won't be able to find any or the correct tags
+
+      - name: "Get Previous tag"
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        run: echo 'version ${{ steps.previoustag.outputs.tag  }}'
+
+      - name: Build golang binary
+        uses: wangyoucao577/go-release-action@v1.23
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: 1.16
+          build_flags: -v
+          ldflags: -X 'github.com/${{ github.repository }}/cmd.VERSION=${{ steps.previoustag.outputs.tag  }}'
+          release_tag: ${{ steps.previoustag.outputs.tag }}
+          md5sum: false
