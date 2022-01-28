@@ -61,5 +61,5 @@ jobs:
           goarch: ${{ matrix.goarch }}
           goversion: 1.16
           build_flags: -v
-          ldflags: -X 'github.com/${{ github.repository }}/cmd.VERSION=${{ needs.release.tag_version.outputs.new_tag }}'
-          release_tag: ${{ needs.release.tag_version.outputs.new_tag }}
+          ldflags: -X 'github.com/${{ github.repository }}/cmd.VERSION=${{ needs.release.steps.tag_version.outputs.new_tag }}'
+          release_tag: ${{ needs.release.steps.tag_version.outputs.new_tag }}
