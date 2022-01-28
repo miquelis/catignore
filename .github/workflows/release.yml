@@ -1,7 +1,7 @@
 # Name of the workflow
 name: Release Golang Binary
 
-# Run on every commit tag which begins with "v" (e.g., "v0.1.4")
+# Run on every commit tag which begins with "v" (e.g., "v0.1.5")
 on:
   push:
   pull_request:
