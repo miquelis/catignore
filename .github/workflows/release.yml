@@ -6,7 +6,7 @@ on:
   push:
   pull_request:
     branches:
-      - "main"
+      - "master"
 
 # Automatically create a GitHub Release, with release details specified (the relevant commits)
 jobs:
@@ -26,7 +26,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: "master"
 
-      - name: Create a GitHub Release
+      - name: Create a gitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.tag_version.outputs.new_tag }}
@@ -34,7 +34,7 @@ jobs:
           body: ${{ steps.tag_version.outputs.changelog }}
 
   build:
-    name: "Build Golang Binary"
+    name: "Build golang binary"
     runs-on: "ubuntu-latest"
     environment: "prod"
     needs: release
