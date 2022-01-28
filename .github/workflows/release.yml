@@ -42,5 +42,5 @@ jobs:
           goarch: ${{ matrix.goarch }}
           goversion: 1.16
           build_flags: -v
-          ldflags: -X 'cmd.VERSION=${{ steps.tag_version.outputs.new_tag }}'
+          ldflags: -X 'cmd.root.VERSION=${{ steps.tag_version.outputs.new_tag }}'
           release_tag: ${{ steps.tag_version.outputs.new_tag }}
