@@ -3,7 +3,7 @@ name: Release
 
 # Run on every commit tag which begins with "v" (e.g., "v0.1.4")
 on:
-  push:
+  pull_request:
     branches:
       - "main"
 
@@ -12,10 +12,17 @@ jobs:
   release:
     name: "Release"
     runs-on: "ubuntu-latest"
+    environment: "prod"
     strategy:
       matrix:
-        goos: [linux]
-        goarch: [amd64]
+        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
+        goos: [linux, windows, darwin]
+        goarch: ["386", amd64, arm64]
+        exclude:
+          - goarch: "386"
+            goos: darwin
+          - goarch: arm64
+            goos: windows
 
     steps:
       - name: Check out code into the Go module directory
@@ -34,7 +41,7 @@ jobs:
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
 
-      - name: Build gorkscrew binary
+      - name: Build golang binary
         uses: wangyoucao577/go-release-action@v1.23
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
