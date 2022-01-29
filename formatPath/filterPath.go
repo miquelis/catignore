@@ -58,7 +58,7 @@ func SearchFiles(sourceDir string) ([]string, error) {
 
 		var fileName = files[len(files)-1]
 
-		if err := CheckFileExist(path, fileName); err != nil {
+		if err := CheckFileExist(path, fileName, ""); err != nil {
 			return err
 		}
 

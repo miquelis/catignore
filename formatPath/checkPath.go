@@ -14,14 +14,22 @@ func CheckCatIgnore(path, rootDir string) error {
 
 	var fileName = files[len(files)-1]
 
+	var msg string = `File "%s" does not exist! Make sure the file is in the corresponding directory`
+
 	switch fileName {
 	case ".catignore":
-		if err := CheckFileExist(path, fileName); err != nil {
+
+		msgErro := fmt.Sprintf(msg, fileName)
+
+		if err := CheckFileExist(path, fileName, msgErro); err != nil {
 			return err
 		}
 		return nil
 	case ".gcloudignore":
-		if err := CheckFileExist(path, fileName); err != nil {
+
+		msgErro := fmt.Sprintf(msg, fileName)
+
+		if err := CheckFileExist(path, fileName, msgErro); err != nil {
 			return err
 		}
 		return nil
@@ -35,12 +43,16 @@ func CheckCatIgnore(path, rootDir string) error {
 }
 
 //CheckFileExist - Checks if a file exists
-func CheckFileExist(path, fileName string) error {
+func CheckFileExist(path, fileName, msgErro string) error {
 	file, err := os.Stat(path)
 	if os.IsNotExist(err) || file.Name() != fileName {
-		msg := fmt.Sprintf(`File or folder named "%s" does not exist! Removing your .ignore file!`, fileName)
-		return errors.New(msg)
-	}
+		if msgErro != "" {
+			return errors.New(msgErro)
+		} else {
+			msg := fmt.Sprintf(`File or folder named "%s" does not exist! Removing your .ignore file!`, fileName)
+			return errors.New(msg)
+		}
 
+	}
 	return nil
 }
