@@ -2,8 +2,18 @@
   // Use IntelliSense to learn about possible attributes.
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+
+  // List systems of golang: go tool dist list
   "version": "0.2.0",
   "configurations": [
+    {
+      "type": "bashdb",
+      "request": "launch",
+      "name": "Bash-Debug (hardcoded script name)",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/install.sh",
+      "args": ["-s", "windows", "-a", "arm"]
+    },
     {
       "name": "Launch Package",
       "type": "go",
