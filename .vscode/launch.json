@@ -6,6 +6,8 @@
   // List systems of golang: go tool dist list
   "version": "0.2.0",
   "configurations": [
+
+    // add plugin https://marketplace.visualstudio.com/items?itemName=rogalmic.bash-debug
     {
       "type": "bashdb",
       "request": "launch",
