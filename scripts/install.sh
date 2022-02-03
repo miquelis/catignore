@@ -3,7 +3,7 @@
 DIR_INSTALL_CATIGNORE=/opt/catignore
 DIR_SERIVCE_CATIGNORE=/etc/profile.d/catignore.sh
 
-VERSION="v0.0.0"
+VERSION="v1.1.3"
 
 HELP="Script to download catignore software in its latest version!
 
