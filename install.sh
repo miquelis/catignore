@@ -249,7 +249,7 @@ function installCatIgnoreLinux() {
     source $DIR_SERIVCE_CATIGNORE
   fi
 
-  echo -e "Info: Installation successful! Close your terminal and open it again."
+  echo -e "Info: Installation successfull! Close your terminal and open it again."
 
   exit 0 
 }
@@ -289,7 +289,7 @@ function donwloadCatIgnore() {
   
   local DOWNLOAD_NAME=$(echo $DOWNLOAD | cut -d"/" -f 9)
   
-  echo -e "Info: Download successful!"
+  echo -e "Info: Download successfull!"
   echo -e "Info: $PWD/${DOWNLOAD_NAME} has been saved successfully!"
 }
 
@@ -309,7 +309,7 @@ function uninstallLinux(){
     exit 1
   fi 
 
-  echo -e "Info: Uninstall successful! Close your terminal and open it again."
+  echo -e "Info: Uninstall successfull! Close your terminal and open it again."
 
   exit 0
 }
