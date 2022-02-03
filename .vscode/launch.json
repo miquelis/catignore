@@ -12,7 +12,8 @@
       "name": "Bash-Debug (hardcoded script name)",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/install.sh",
-      "args": ["-s", "windows", "-a", "arm"]
+      "args": ["--list"]
+      
     },
     {
       "name": "Launch Package",

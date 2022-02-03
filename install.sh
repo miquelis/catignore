@@ -1,108 +1,131 @@
-#!bin/bash
+#!/bin/bash
+
+DIR_INSTALL_CATIGNORE=/opt/catignore
+DIR_SERIVCE_CATIGNORE=/etc/profile.d/catignore.sh
 
 VERSION="v0.0.0"
 
 HELP="Script to download catignore software in its latest version!
 
 Usage:
+
   sudo bash install.sh [flags]
 
 Flags:
-  -h, --help          help for catignore
-  -v, --version       Print just the version number.
-  -s, --system        Tell the operating system to download. The systems are linux, windows and darwin. When informing the Linux system, it will be automatically installed on your system and if it is other systems, the download will be carried out in the directory where the script was downloaded.
-  It is mandatory to use the -a or –architecture flag together with the -s, --system, otherwise an error will be generated.
-  -a, --architecture   Report the architecture of the operating system. Supported architectures: linux [386, amd64, arm64], windows [386, amd64] and darwin [amd64, arm64].
 
-Usage example install linux: sudo bash install.sh -s linux -a amd64
-Usage example download: bash install.sh -s windows -a amd64"
+  --help, -h          
+    Help for catignore
+
+  --version, -v       
+    Print just the version number.
+
+  --install, -i [Options] 
+    Install from catignore on distributions: Linux
+
+      --system, -s [required]
+        Inform the supported OS
+          
+          --architecture, -a [required]
+            Enter the architecture supported by the OS
+
+            Example:
+              sudo bash install.sh --install -s linux -a amd64
+
+  --download, -d [Options]
+    Download catignore for the given operating system.
+
+        The file is saved in the directory where the script is running.
+
+      --system, -s [required]
+      Inform the supported OS
+        
+        --architecture, -a [required]
+          Enter the architecture supported by the OS
+
+          Example:
+            bash install.sh --download -s windows -a amd64
+
+  --list, -l
+    List all OS compatible with catignore
+
+    Example:
+      bash install.sh --list
+
+  --uninstall         
+    Uninstall catignore from linux 
+
+    Example:
+      sudo bash install.sh --uninstall"
 
 
 # argsCli - Get the information passed by parameter
-# $1 = flags, $2 = SO, $3 = flag -a and $4 = architecture
-# Example: $1 = -s, $2 = linux, $3 = -a and $4 = amd64
+# $1 = flags, $2 = flag -s, $3 = SO, $4 = flag -a and $5 = architecture
+# Example: $1 = --install, $2 = -s, $3 = linux, $4 = -a and $5 = amd64
 function argsCli() {
 
-  [ -z "$1" ] && echo "Offer any option, use -h for help" && exit 1
+  [ -z "$1" ] && echo -e "Offer any option, use -h for help" && exit 1
 
   case $1 in
-    -h | --help) ## Show program help
-      echo "${HELP}"
+    --help | -h) # Show program help
+      echo -e "${HELP}"
       exit 0
     ;;
-    -v | --version) ## display the program version
-      echo "version ${VERSION}"
+    --version | -v) # display the program version
+      echo -e "version ${VERSION}"
       exit 0
     ;;
-    -s | --system) ## Inform the operating system
-      checkSO $2 $3 $4
+    --list | -l) # display the program version
+      listVersions
+      exit 0
+    ;;
+    --install | -i) # Install
+      
+      argsInstallDownloaded $1 $2 $3 $4 $5
+      exit 0
+    ;;
+    --download | -d) # Download 
+      
+      argsInstallDownloaded $1 $2 $3 $4 $5
+      exit 0
+    ;;
+    --uninstall) # Uninstaller catignore
+      uninstallLinux
       exit 0
     ;;
     *) ## Erro unknown flags
-      echo "Erro: unknown ${1} flag! Type -h or --help to check the flags."
+      echo -e "Erro: unknown ${1} flag! Type -h or --help to check the flags."
       exit 2
   esac
 }
 
-# checkSO - Check if the operating system is correct
-# $1 = SO, $2 = flag -a and $3 = architecture
-# Example: $1 = linux, $2 = -a and $3 = amd64
-function checkSO() {
-  
-  if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ];
+# argsInstallDownloaded - Get the information passed by parameter, to install catignore
+# $1 = flag -i, $2 = flag -s, $3 = SO, $4 = flag -a and $5 = architecture
+# Example: $1 = --install, $2 = -s, $3 = linux, $4 = -a and $5 = amd64
+function argsInstallDownloaded() {
+
+  if [ -z "$2" ] || [ -z "$3" ];
   then  
-    echo "Warning: Flags or fields not informed, use -h for help" 
+    echo -e "Warning: Flag -s and OS name is required, use -h for help" 
+    exit 1
+  fi
+  
+  if [ -z "$4" ] || [ -z "$5" ];
+  then  
+    echo -e "Warning: Flag -a and architecture name is required, use -h for help" 
     exit 1
   fi
 
-  case $1 in
-  "linux")
+  argsCliArch $4 $5
 
-    local retval=$( argsCliArch $2 $3)
-
-    if [[ $retval == "true" ]];then
-        installCatIgnore $1 $3
-    fi
-    
-    exit 0
-  ;;
-  "windows")  
-   
-    if [[ "$3" == "arm64" ]]; then
-      echo "Warning: There is no architecture version ${3} for Windows"
-      exit 2 
-    fi
-
-    local retval=$( argsCliArch $2 $3)
-
-    if [[ $retval == "true" ]]; then
-      donwloadCatIgnore $1 $3
+  case $2 in   
+    -s | --system) # Inform the OS
+      checkSO $1 $3 $5
       exit 0
-    else 
-      echo "$retval"
+    ;;   
+    *) # Erro unknown flags
+      echo -e "Erro: unknown ${1} flag! Use the -s flag and OS name to download."
       exit 2
-    fi
-  ;;
-  "darwin")
-
-    if [[ "$3" == "386" ]]; then
-      echo "Warning: There is no architecture version ${3} for darwin"
-      exit 2 
-    fi
-
-    local retval=$( argsCliArch $2 $3)
-
-    if [[ $retval == "true" ]];then
-        donwloadCatIgnore $1 $3
-    fi
-   
-    exit 0
-  ;;
-  *) ## Erro unknown flags
-    echo "Erro: unknown ${1} flag! Type -h or --help to check the flags."
-    exit 2
   esac
-
 }
 
 # argsCliArch - Get the information passed by parameter
@@ -115,17 +138,74 @@ function argsCliArch() {
 
       local retval=$( checkArchiteture $2)
 
-      if [[ $retval == "true" ]]; then
-        echo "true"
-      else 
-        echo "Warning: Architecture $2 not found for download"  
+      if [[ $retval != "true" ]]; then
+        echo -e "Warning: Architecture $2 not found for download"  
         exit 3
       fi          
     ;;
-    *) ## Erro unknown flags
-      echo "Erro: unknown ${1} flag! Type -h or --help to check the flags."
+    *) # Erro unknown flags
+      echo -e "Erro: unknown ${1} flag! Use the -a flag and architecture name to download."
       exit 3
   esac
+}
+
+# checkSO - Check if the OS is correct
+# $1 = flag -i, $2 = SO and $3 = architecture
+# Example: $1 = --install, $2 = linux and $3 = amd64
+function checkSO() {  
+  
+  case $2 in
+  "linux")
+
+      if [[ "$1" == "--install" ]] ||  [[ $1 == "-i" ]];
+      then     
+        installCatIgnoreLinux $2 $3
+      elif [[ "$1" == "--download" ]] ||  [[ $1 == "-d" ]];
+      then
+        donwloadCatIgnore $2 $3 
+      fi
+
+    exit 0
+  ;;
+  "windows")  
+   
+    if [[ "$3" == "arm64" ]]; then
+      echo -e "Warning: There is no architecture version ${3} for ${2}"
+      exit 2 
+    fi
+   
+    if [[ "$1" == "--install" ]] ||  [[ "$1" == "-i" ]];
+    then     
+      echo -e "Warning: We still don't have catignore installation on OS ${2}."
+    elif [[ "$1" == "--download" ]] ||  [[ "$1" == "-d" ]];
+    then
+      donwloadCatIgnore $2 $3 
+    fi
+
+    exit 0
+  ;;
+  "darwin")
+
+    if [[ "$3" == "386" ]]; then
+      echo -e "Warning: There is no architecture version ${3} for darwin"
+      exit 2 
+    fi
+   
+    if [[ $1 == "--install" ]] ||  [[ $1 == "-i" ]];
+    then     
+      echo -e "Warning: We still don't have catignore installation on OS ${2}."
+    elif [[ $1 == "--download" ]] ||  [[ $1 == "-d" ]];
+    then
+      donwloadCatIgnore $2 $3 
+    fi
+
+    exit 0
+  ;;
+  *) # Erro unknown flags
+    echo -e "Erro: unknown ${1} flag! Type -h or --help to check the flags."
+    exit 2
+  esac
+
 }
 
 # checkArchiteture - Check if the architeture is correct
@@ -134,99 +214,129 @@ function argsCliArch() {
 function checkArchiteture() {
  case $1 in
   "386")
-    echo "true"
+    echo -e "true"
   ;;
   "amd64")
-    echo "true"
+    echo -e "true"
   ;;
   "arm64")
-    echo "true"
+    echo -e "true"
   ;;
   *)
-    echo "false"
+    echo -e "false"
   esac
 }
 
-#installCatIgnore - After downloading the logs, the program will be installed.
+#installCatIgnoreLinux - After downloading the logs, the program will be installed.
 # $1 = SO and $2 = architecture
 # Example: $1 = linux and $2 = amd64
-function installCatIgnore() {
+function installCatIgnoreLinux() {
 
   requireSudo
 
-  local PATHC=/opt/catignore
-  
-  mkdir -p $PATHC 
-  cd $PATHC
+  mkdir -p $DIR_INSTALL_CATIGNORE
+  cd $DIR_INSTALL_CATIGNORE
 
-  donwloadCatIgnoreLinux $1 $2
+  donwloadCatIgnore $1 $2
+
+  echo -e "Info: Installing catignore, please wait...."
+
+  tar xzf catignore-*
+  rm -rf catignore-*
 
   if ! grep -xq "catignore.sh" /etc/profile.d/*.sh &> /dev/null; then
-    local SAVEFILE="/etc/profile.d/catignore.sh"
-    echo "alias catignore=$PATHC/catignore" > $SAVEFILE
-    source $SAVEFILE
+    echo -e "alias catignore=$DIR_INSTALL_CATIGNORE/catignore" > $DIR_SERIVCE_CATIGNORE  
+    source $DIR_SERIVCE_CATIGNORE
   fi
 
-  echo "Info: Installation successful! Close your terminal and open it again."
+  echo -e "Info: Installation successful! Close your terminal and open it again."
 
-  exit 0
- 
+  exit 0 
 }
 
 #requireSudo - Check if the script is running as sudo
 function requireSudo() {
   if [[ $UID != 0 ]]; then
-    echo "Warning: Please run this script with sudo:"
-    echo "sudo bash $0 $*"
+    echo -e "Warning: Please run this script with sudo:"
+    echo -e "sudo bash $0 $*"
     exit 1
   fi
 }
 
-#donwloadCatIgnoreLinux - Download the program in the latest version
-# $1 = SO and $2 = architecture
-# Example: $1 = linux and $2 = amd64
-function donwloadCatIgnoreLinux() {
-  local SO=$1
-  local ARCHITECTURE=$2
-
-  echo -e "Info: Downloading the latest version of the program for the system ${SO}-${ARCHITECTURE} \n"
- 
-  curl -s https://api.github.com/repos/miquelis/catignore/releases/latest \
-  | grep browser_download_url \
-  | grep $SO-$ARCHITECTURE | cut -d '"' -f 4 | xargs wget -O -  | tar -xz
-
-  local retval="$?"
-
-  if [ $retval -ne 0 ]; then
-    echo "Warning: Failed to download the latest version of the program for the system ${SO}"
-    exit 1
-  fi 
-}
-
-#donwloadCatIgnore - Download the program in the latest version
+# donwloadCatIgnore - Download the program in the latest version
 # $1 = SO and $2 = architecture
 # Example: $1 = linux and $2 = amd64
 function donwloadCatIgnore() {
   local SO=$1
   local ARCHITECTURE=$2
 
-  echo -e "Info: Downloading the latest version of the program for the system ${SO}-${ARCHITECTURE}" 
+  echo "Info: Downloading the latest version of the program for the system ${SO}-${ARCHITECTURE}\n"
+ 
+  local DOWNLOAD=$(wget -qO- https://api.github.com/repos/miquelis/catignore/releases/latest \
+  | grep browser_download_url \
+  | grep $SO-$ARCHITECTURE \
+  | cut -d '"' -f 4)
 
-  local DOWNLOAD_URL=$(curl -s https://api.github.com/repos/miquelis/catignore/releases/latest | grep browser_download_url | grep $SO-$ARCHITECTURE | cut -d '"' -f 4)
-  curl -LJO $DOWNLOAD_URL
+  wget -t 3 $DOWNLOAD
+ 
+  if [  $? -ne 0 ]; then
+    echo -e "Erro: Failed to download the latest version of the program for the system ${SO}-${ARCHITECTURE}\n"
 
-  local retval="$?"
-
-  if [ $retval -ne 0 ]; then
-    echo "Warning: Failed to download the latest version of the program for the system ${SO}-${ARCHITECTURE}"
+    echo -e "Warning: Removing installation, please wait...\n"
+    uninstallLinux
     exit 1
-  fi
+  fi 
+  
+  local DOWNLOAD_NAME=$(echo $DOWNLOAD | cut -d"/" -f 9)
+  
+  echo -e "Info: Download successful!"
+  echo -e "Info: $PWD/${DOWNLOAD_NAME} has been saved successfully!"
 }
 
+# uninstallLinux - Removes catignore
+# Don't need arguments
+function uninstallLinux(){
 
+  requireSudo
+
+  echo -e "Info: Uninstall catignore, please wait..."
+
+  rm -rf $DIR_INSTALL_CATIGNORE
+  rm -rf $DIR_SERIVCE_CATIGNORE
+  
+  if [ $? -ne 0 ]; then
+    echo -e "Erro: Unistall catignore failed, try again later!"
+    exit 1
+  fi 
+
+  echo -e "Info: Uninstall successful! Close your terminal and open it again."
+
+  exit 0
+}
+
+function listVersions() {
+
+  local LIST_DOWNLOAD
+  
+  LIST_DOWNLOAD+=($(wget -qO- https://api.github.com/repos/miquelis/catignore/releases/latest \
+  | grep browser_download_url \
+  | cut -d '"' -f 4))
+
+  
+  if [ -z $LIST_DOWNLOAD ]; then
+    echo -e "Erro: Failed to list catignore versions, try again later!"
+    exit 1
+  fi 
+
+  echo -e "\nList of latest versions:"
+
+  for value in "${LIST_DOWNLOAD[@]}"
+  do
+      local version=$(echo $value | cut -d"/" -f 9 | cut -d"." -f4,5 --complement)
+      echo -e " -> $version"
+  done 
+
+  exit 0
+}
 # Start of script execution
-argsCli $1 $2 $3 $4
-
-# source /etc/bashrc  &> /dev/null
-# source ~/.bashrc  &> /dev/null
-# source ~/.bash_profile  &> /dev/null
+argsCli $1 $2 $3 $4 $5
