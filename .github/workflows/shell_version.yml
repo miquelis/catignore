@@ -29,8 +29,7 @@ jobs:
 
       - name: Commit files # transfer the new html files back into the repository
         run: |
-          git config --local user.name  ${{ github.actor }}
-          git add ./docs
+          git config --local user.name  ${{ github.actor }}        
           git commit -m "added version ${{ steps.previoustag.outputs.tag }} in install.sh"
 
       - name: Push changes # push the output folder to your repo
