@@ -25,11 +25,12 @@ jobs:
         run: echo 'version ${{ steps.previoustag.outputs.tag }}'
 
       - name: Add version install.sh
-        run: sed -i 's/v[0-9].[0-9].[0-9]/${{ steps.previoustag.outputs.tag }}/i' install.sh
+        run: sed -i 's/v[0-9].[0-9].[0-9]/${{ steps.previoustag.outputs.tag }}/i' ./scripts/install.sh
 
       - name: Commit files # transfer the new html files back into the repository
         run: |
-          git config --local user.name  ${{ github.actor }}        
+          git config --local user.name  ${{ github.actor }}
+          git add scripts/install.sh
           git commit -m "added version ${{ steps.previoustag.outputs.tag }} in install.sh"
 
       - name: Push changes # push the output folder to your repo
