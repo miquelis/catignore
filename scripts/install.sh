@@ -17,7 +17,8 @@ PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
  
 ######################################################
-DIR_INSTALL_CATIGNORE=/usr/bin
+DIR_INSTALL_CATIGNORE=/opt/catignore/bin
+LINK_INSTALL_CATIGNORE=/usr/bin
 
 VERSION="v1.2.0"
 
@@ -250,7 +251,7 @@ function installCatIgnoreLinux() {
 
   requireSudo
 
-  # mkdir -p $DIR_INSTALL_CATIGNORE
+  mkdir -p $DIR_INSTALL_CATIGNORE
   cd $DIR_INSTALL_CATIGNORE
 
   donwloadCatIgnore $1 $2
@@ -260,7 +261,11 @@ function installCatIgnoreLinux() {
   tar xzf catignore-*
   rm -rf catignore-*
 
-  echo -e "${GREEN} Info: Installation successfull! Close your terminal and open it again.${NC}"
+  ln -sf $DIR_INSTALL_CATIGNORE/catignore $LINK_INSTALL_CATIGNORE/catignore
+
+  echo -e "${GREEN} Info: Installation successfull!${NC}"
+
+  catignore -v
 
   exit 0 
 }
@@ -313,6 +318,8 @@ function uninstallLinux(){
   echo -e "${GREEN} Info: Uninstall catignore, please wait...${NC}"
 
   rm -rf $DIR_INSTALL_CATIGNORE/catignore
+
+  unlink $LINK_INSTALL_CATIGNORE/catignore
   
   if [ $? -ne 0 ]; then
     echo -e " ${RED} Erro: Unistall catignore failed, try again later!${NC}"
