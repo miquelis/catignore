@@ -10,7 +10,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 
+	"github.com/fatih/color"
 	createzip "github.com/miquelis/catignore/createZip"
 	"github.com/spf13/cobra"
 )
@@ -24,12 +27,13 @@ var VERSION string = "v0.0.0"
 var rootCmd = &cobra.Command{
 
 	Use:   "catignore",
-	Short: "Catignore creates a .zip file checking which files (or patterns) to ignore.",
-	Long: `Catignore creates a .zip file checking which files (or patterns) to ignore.
+	Short: color.YellowString("Catignore creates a .zip file checking which files (or patterns) to ignore."),
+	Long: color.YellowString(`
+Catignore creates a .zip file checking which files (or patterns) to ignore.
 	
 The files (or patterns) must be added in the .catignore file (or in the supported files list, example: ".gcloudignore")
 	
-For more information access the documentation: https://github.com/miquelis/catignore#readme`,
+For more information access the documentation: https://github.com/miquelis/catignore#readme`),
 
 	Args: func(cmd *cobra.Command, args []string) error {
 
@@ -98,12 +102,27 @@ func Execute() {
 
 func init() {
 
+	// Added color in terminal cobra
+	cobra.AddTemplateFunc("StyleHeading", color.New(color.FgGreen).SprintFunc())
+	usageTemplate := rootCmd.UsageTemplate()
+	usageTemplate = strings.NewReplacer(
+		`Usage:`, `{{StyleHeading "Usage:"}}`,
+		`Aliases:`, `{{StyleHeading "Aliases:"}}`,
+		`Available Commands:`, `{{StyleHeading "Available Commands:"}}`,
+		`Global Flags:`, `{{StyleHeading "Global Flags:"}}`,
+	).Replace(usageTemplate)
+
+	re := regexp.MustCompile(`(?m)^Flags:\s*$`)
+	usageTemplate = re.ReplaceAllLiteralString(usageTemplate, `{{StyleHeading "Flags:"}}`)
+
+	rootCmd.SetUsageTemplate(usageTemplate)
+
 	rootCmd.Flags().StringVarP(
 		&catIgnorePath,
 		"path-catignore",
 		"p",
 		".",
-		"Specify the path of the .catignore file or one of the supported files. If not specified, the directory being executed will be used.",
+		color.CyanString("Specify the path of the .catignore file or one of the supported files. If not specified, the directory being executed will be used."),
 	)
 
 	rootCmd.Flags().StringVarP(
@@ -111,7 +130,7 @@ func init() {
 		"name-catignore",
 		"c",
 		".catignore",
-		`Specify the name of the .ignore file. ".catignore" and ".gcloudignore" files are currently supported.`,
+		color.CyanString(`Specify the name of the .ignore file. ".catignore" and ".gcloudignore" files are currently supported.`),
 	)
 
 	rootCmd.Flags().StringVarP(
@@ -119,7 +138,7 @@ func init() {
 		"output",
 		"o",
 		"/tmp",
-		`Specify the path where the zip file will be saved.`,
+		color.CyanString(`Specify the path where the zip file will be saved.`),
 	)
 
 	rootCmd.Flags().StringVarP(
@@ -127,9 +146,9 @@ func init() {
 		"name-zip",
 		"n",
 		"functions",
-		`Specify the name of the zip file. No need to put the .zip extension`,
+		color.CyanString(`Specify the name of the zip file. No need to put the .zip extension`),
 	)
 
-	rootCmd.Flags().BoolVarP(&version, "version", "v", false, "Print just the version number.")
+	rootCmd.Flags().BoolVarP(&version, "version", "v", false, color.CyanString("Print just the version number."))
 
 }
