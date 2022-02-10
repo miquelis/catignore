@@ -2,5 +2,5 @@
 *.html
 go.mod
 go.sum
-
 .github
+scripts

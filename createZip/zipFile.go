@@ -55,6 +55,8 @@ func ZipCatIgnore(rootDir string, pathIgnore []string, outputFilePath string) (s
 
 	var fileName string = outputFilePath + ".zip"
 
+	pathIgnore = append(pathIgnore, filepath.Join(rootDir, fileName))
+
 	zipfile, err := os.Create(fileName)
 	if err != nil {
 		return "", err
