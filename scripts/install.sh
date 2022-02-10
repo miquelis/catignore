@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 DIR_INSTALL_CATIGNORE=/opt/catignore/bin
 LINK_INSTALL_CATIGNORE=/usr/bin
 
-VERSION="v1.2.0"
+VERSION="v1.3.0"
 
 HELP="Script to download catignore software in its latest version!
 
